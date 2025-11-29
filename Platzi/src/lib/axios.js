@@ -1,0 +1,71 @@
+import axios from 'axios';
+
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://api.escuelajs.co/api/v1';
+
+const instance = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+instance.interceptors.response.use(
+  (response) => {
+    return response.data; // Faqat toza data qaytaramiz
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Belgilab qo'yamizki, qayta urinish boshlandi
+
+      try {
+        const refreshToken = localStorage.getItem('refresh_token');
+
+        if (!refreshToken) {
+          throw new Error("Refresh token mavjud emas");
+        }
+
+        const response = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+          refreshToken: refreshToken // API hujjati bo'yicha "camelCase" yuboryapmiz
+        });
+
+        const { access_token, refresh_token } = response.data;
+
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', refresh_token);
+
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+
+        return instance(originalRequest);
+
+      } catch (refreshError) {
+        console.error("Session expired. Please login again.");
+
+        // Hamma narsani tozalab, login sahifasiga otamiz
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_data');
+
+        window.location.href = '/login';
+
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default instance;
