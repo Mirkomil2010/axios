@@ -22,13 +22,13 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    return response.data; // Faqat toza data qaytaramiz
+    return response.data;
   },
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Belgilab qo'yamizki, qayta urinish boshlandi
+      originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refresh_token');
@@ -38,7 +38,7 @@ instance.interceptors.response.use(
         }
 
         const response = await axios.post(`${BASE_URL}/auth/refresh-token`, {
-          refreshToken: refreshToken // API hujjati bo'yicha "camelCase" yuboryapmiz
+          refreshToken: refreshToken
         });
 
         const { access_token, refresh_token } = response.data;
@@ -53,7 +53,6 @@ instance.interceptors.response.use(
       } catch (refreshError) {
         console.error("Session expired. Please login again.");
 
-        // Hamma narsani tozalab, login sahifasiga otamiz
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user_data');

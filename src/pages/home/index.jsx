@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import productService from "@/services/product-service";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -19,10 +18,13 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center">
       {JSON.stringify(products)}
-      <Button>Click</Button>
+      <div className="mt-2.5 border-2 border-t-stone-500 w-full">
+        <p>posts</p>
+      </div>
     </div>
   );
 }
