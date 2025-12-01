@@ -1,13 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://api.escuelajs.co/api/v1';
+const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://fakestoreapi.com';
 
 const instance = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
+
+
 
 instance.interceptors.request.use(
   (config) => {
