@@ -25,7 +25,10 @@ const productService = {
 
     getProductsByCategory: async (categoryId) => {
         return await instance.get(`/categories/${categoryId}/products`);
-    }
+    },
+    createProduct: async (productData) => {
+        return await instance.post("/products/", productData);
+    },
 };
 
 export default productService;

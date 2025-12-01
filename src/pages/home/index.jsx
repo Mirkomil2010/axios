@@ -1,6 +1,7 @@
 import productService from "@/services/product-service";
 import { useState } from "react";
 import { useEffect } from "react";
+import CreateProductForm from "@/components/CreateProductForm";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -22,8 +23,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col items-center">
       {JSON.stringify(products)}
-      <div className="mt-2.5 border-2 border-t-stone-500 w-full">
-        <p>posts</p>
+      <div className="mt-8">
+        <CreateProductForm /> {/* Add the new form here */}
       </div>
     </div>
   );
