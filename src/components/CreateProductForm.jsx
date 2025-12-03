@@ -43,7 +43,7 @@ export default function CreateProductForm() {
 
     } catch (err) {
       console.error("Post Error:", err);
-      setError("Failed to create product. Check console for details.");
+      setError("Failed.");
     } finally {
       setLoading(false);
     }

@@ -24,7 +24,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col items-center">
       {JSON.stringify(products)}
       <div className="mt-8">
-        <CreateProductForm /> {/* Add the new form here */}
+        <CreateProductForm />
       </div>
     </div>
   );
