@@ -3,31 +3,31 @@ import instance from "@/lib/axios";
 const productService = {
 
     getAllProducts: async (params) => {
-        return await instance.get("/products", { params });
+        return await instance.get("/posts", { params });
     },
 
     getProductById: async (id) => {
-        return await instance.get(`/products/${id}`);
+        return await instance.get(`/posts/${id}`);
     },
 
 
     createProduct: async (productData) => {
-        return await instance.post("/products/", productData);
+        return await instance.post("/posts/", productData);
     },
 
     updateProduct: async (id, productData) => {
-        return await instance.put(`/products/${id}`, productData);
+        return await instance.put(`/posts/${id}`, productData);
     },
 
     deleteProduct: async (id) => {
-        return await instance.delete(`/products/${id}`);
+        return await instance.delete(`/posts/${id}`);
     },
 
     getProductsByCategory: async (categoryId) => {
-        return await instance.get(`/categories/${categoryId}/products`);
+        return await instance.get(`/categories/${categoryId}/posts`);
     },
     createProduct: async (productData) => {
-        return await instance.post("/products/", productData);
+        return await instance.post("/posts/", productData);
     },
 };
 
