@@ -118,3 +118,36 @@
     @apply bg-background text-foreground;
   }
 }
+body {
+  background: #f0f2f5;
+  font-family: Arial, sans-serif;
+}
+
+.auth-box {
+  width: 320px;
+  background: white;
+  margin: 80px auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.auth-box p {
+  margin-top: 15px;
+}

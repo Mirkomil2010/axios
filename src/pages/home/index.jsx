@@ -14,6 +14,10 @@ export default function HomePage() {
       console.error("Xatolik:", error);
     }
   };
+      localStorage.removeItem("access_token");
+    setAuthenticated(false);
+    navigate("/login");
+
 
   useEffect(() => {
     fetchProducts();
