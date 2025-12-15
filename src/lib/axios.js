@@ -1,62 +1,63 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://jsonplaceholder.typicode.com';
+const BASE_URL =
+  import.meta.env.VITE_BASE_URL || "https://api.escuelajs.co/api/v1";
 
 const instance = axios.create({
   baseURL: BASE_URL,
 });
 
-
-
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token && config.headers) {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 instance.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
+  (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh-token") &&
+      !originalRequest.url.includes("/auth/login")
+    ) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
+        const refreshToken = localStorage.getItem("refresh_token");
+        if (!refreshToken) throw new Error("No refresh token");
 
-        if (!refreshToken) {
-          throw new Error("Refresh token mavjud emas");
-        }
-
-        const response = await axios.post(`${BASE_URL}/auth/refresh-token`, {
-          refreshToken: refreshToken
+        const res = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+          refresh_token: refreshToken,
         });
 
-        const { access_token, refresh_token } = response.data;
+        const { access_token, refresh_token } = res.data;
 
-        localStorage.setItem('access_token', access_token);
-        localStorage.setItem('refresh_token', refresh_token);
+        localStorage.setItem("access_token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
 
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
         return instance(originalRequest);
-
       } catch (refreshError) {
-        console.error("Session expired. Please login again.");
 
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_data');
+        localStorage.clear();
 
-        window.location.href = '/login';
+        window.location.replace("/login");
 
         return Promise.reject(refreshError);
       }

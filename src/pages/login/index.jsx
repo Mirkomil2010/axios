@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "@/store/useAuthStore";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login = () => {
   const navigate = useNavigate();
+  const { login, loading, error } = useAuthStore()
 
-  const handleLogin = (e) => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const savedUser = JSON.parse(localStorage.getItem("user"));
+    const success = await login({ email: formData.email, password: formData.password });
 
-    if (!savedUser) {
-      alert("No user found. Please register first.");
-      return;
-    }
-
-    if (email === savedUser.email && password === savedUser.password) {
-      alert("Login successful!");
+    if (success) {
       navigate("/");
-    } else {
-      alert("Invalid email or password");
     }
   };
 
@@ -28,29 +29,44 @@ export default function Login() {
     <div className="auth-box">
       <h2>Login</h2>
 
-      <form onSubmit={handleLogin}>
+      {error && (
+        <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+          {error}
+        </div>
+      )
+      }
+
+
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={handleChange}
           required
         />
 
         <input
           type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          placeholder="*****"
+          value={formData.password}
+          onChange={handleChange}
           required
         />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading} onClick={handleSubmit}>
+          {loading ? "Yuklanmoqda..." : "Kirish"}
+        </button>
       </form>
 
+
       <p>
-        Don’t have an account? <Link to="/register">Register</Link>
+        Don’t have an account? <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
       </p>
     </div>
   );
 }
+
+export default Login;

@@ -1,57 +1,65 @@
 import { create } from "zustand";
-import authService from "../services/authService";
+import { authService } from "@/services/authService";
 
-const useAuthStore = create((set) => ({
+export const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
   loading: false,
   error: null,
 
-  login: async (email, password) => {
+  login: async (payload) => {
     set({ loading: true, error: null });
+
     try {
-      const { access_token, refresh_token } = await authService.login(email, password);
+      const data = await authService.login(payload);
+
+      const { access_token, refresh_token } = data;
 
       localStorage.setItem("access_token", access_token);
       localStorage.setItem("refresh_token", refresh_token);
 
-      const user = await authService.getProfile();
-
-      set({
-        user: user,
-        isAuthenticated: true,
-        loading: false
-      });
+      try {
+        const user = await authService.getProfile();
+        set({ user, isAuthenticated: true, loading: false, });
+      } catch (error) {
+        console.warn("profil yuklanmadi", error);
+        set({ user: { email: payload.email }, isAuthenticated: true, loading: false })
+      }
 
       return true;
     } catch (error) {
+      console.error("Login Error:", error)
       set({
-        error: error.response?.data?.message || "Login failed",
-        loading: false
+        error: error?.response?.data?.message || error.message || "Login failed",
+        loading: false,
       });
       return false;
     }
   },
-
-  logout: () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    set({ user: null, isAuthenticated: false });
-  },
-
-  checkAuth: async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
-
+  register: async (formData) => {
+    set({ loading: true, error: null })
     try {
-      const user = await authService.getProfile();
-      set({ user: user, isAuthenticated: true });
+      const payload = {
+        ...formData,
+        avatar: "https://picsum.photos/800"
+      }
+
+      await authService.register(payload)
+
+      set({ isLoading: false });
+
+      return true;
+
     } catch (error) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      set({ user: null, isAuthenticated: false });
+      console.error("Register Error:", error);
+      set({
+        isLoading: false,
+         error: error?.response?.data?.message || error.message || "Ro'yxatdan o'tishda xatolik",
+      })
+
+      return false;
+
     }
-  }
+  },
 }));
 
-export default useAuthStore;

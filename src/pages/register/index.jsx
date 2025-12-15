@@ -1,33 +1,49 @@
+import { useAuthStore } from "@/store/useAuthStore";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { register, isLoading, error } = useAuthStore()
 
-  const handleRegister = (e) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ name, email, password })
-    );
+    const success = await register(formData)
 
-    alert("Registered successfully");
-    navigate("/login");
+    if (success) {
+      alert("Registered successfully!")
+      navigate("/login")
+    }
   };
 
   return (
     <div className="auth-box">
       <h2>Register</h2>
 
-      <form onSubmit={handleRegister}>
-        <input placeholder="Name" onChange={e => setName(e.target.value)} />
-        <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
-        <button>Register</button>
+      {error && (
+        <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+          {error}
+        </div>
+      )
+      }
+
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="name" required placeholder="Name" value={formData.name} onChange={handleChange} />
+        <input type="email" name="email" required placeholder="Email" value={formData.email} onChange={handleChange} />
+        <input type="password" name="password" required placeholder="*****" value={formData.password} onChange={handleChange} />
+        <button type="submit" disabled={isLoading}>Register</button>
       </form>
 
       <p>

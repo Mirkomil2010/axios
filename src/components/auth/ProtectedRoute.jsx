@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import useAuthStore from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ProtectedRoutes = () => {
   const { isAuthenticated, checkAuth } = useAuthStore();
@@ -8,12 +8,12 @@ const ProtectedRoutes = () => {
 
 
   useEffect(() => {
-    checkAuth();
+    checkAuth;
   }, [checkAuth]);
 
   const token = localStorage.getItem("access_token");
 
-  if (!token && !isAuthenticated) {
+  if (!token) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
